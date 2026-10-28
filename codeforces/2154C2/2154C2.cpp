@@ -1,108 +1,129 @@
 #include <bits/stdc++.h>
-#define int long long
 using namespace std;
-vector<bool> isprime(200002, true);
-vector<int> primes, spf(200002);
-vector<int> cnt(200002, 0), factors;
+#define int long long
+const int MAXA = 200005;
+int t, n;
+vector<int> primes, spf(200020);
+vector<bool> isprime(200020, true);
+int stamp[MAXA + 5], cur_stamp = 0;
 void euler_sieve(int n) {
     for(int i = 2; i <= n; i++) {
         if(isprime[i]) {
-            primes.push_back(i);
             spf[i] = i;
+            primes.push_back(i);
         }
         for(int num : primes) {
-            if(num * i > n)
+            if(i * num > n)
                 break;
-            isprime[num * i] = false;
-            spf[num * i] = num;
+            isprime[i * num] = false;
+            spf[i * num] = num;
             if(i % num == 0)    break;
         }
     }
 }
-int t, n;
 void solve() {
-    factors.clear();
-    for(int i = 0; i <= 200000; i++)
-        cnt[i] = 0;
     cin >> n;
     vector<int> a(n), b(n);
-    for(int i = 0; i < n; i++) 
-        cin >> a[i];
-    int mn1 = LLONG_MAX, mn2 = LLONG_MAX;
-    cout << "OK!\n";
+    int even_cnt = 0;
     for(int i = 0; i < n; i++) {
-        cin >> b[i];
-        int cur;
-        if(a[i] % 2 == 0)   cur = 0;
-        else    cur = b[i];
-        if(cur <= mn1) {
-            mn2 = mn1;
-            mn1 = cur;
-            continue;
-        }
-        if(cur > mn1 && cur <= mn2)   mn2 = b[i];
+        cin >> a[i];
+        if(a[i] % 2 == 0)
+            even_cnt++;
     }
-    int ans = mn1 + mn2;
-    if(ans == 0) {
+    for(int i = 0; i < n; i++)
+        cin >> b[i];
+    if(even_cnt >= 2) {
         cout << 0 << '\n';
         return;
     }
-
-    cout << "OK!\n";
-
+    vector<int> factors;
+    ++cur_stamp;
     for(int i = 0; i < n; i++) {
-        int record = a[i];
-        while(a[i] > 1) {
-            int p = spf[a[i]];
-            if(++cnt[p] == 2) {
+        int x = a[i];
+        while(x > 1) {
+            int cur = spf[x];
+            factors.push_back(cur);
+            if(stamp[cur] != cur_stamp) {
+                stamp[cur] = cur_stamp;
+            }
+            else {
                 cout << 0 << '\n';
                 return;
             }
-            factors.push_back(p);
-            while(a[i] % p == 0)    a[i] /= p;
+            while(x % cur == 0)    x /= cur;
         }
-        a[i] = record;
     }
-
-    cout << "OK!\n";
-
-    sort(factors.begin(), factors.end());
-    factors.erase(unique(factors.begin(), factors.end()), factors.end());
-    for(int i = 0; i < n; i++) {
-        int cur = a[i] + 1;
-        while(cur > 1) {
-            int p = spf[cur];
-            if(cnt[p] == 1) {
+    if(even_cnt == 1) {
+        int ans = LLONG_MAX, idx = -1;
+        for(int i = 0; i < n; i++) {
+            if(a[i] % 2 == 1)
                 ans = min(ans, b[i]);
-                break;
-            }
-            while(cur % p == 0)    cur /= p;
+            else    idx = i;
         }
-    }
-
-    cout << "OK!\n";
-
-    vector<int> mnid;
-    for(int i = 0; i < n; i++)
-        if(b[i] == mn1)
-            mnid.push_back(i);
-    if((int)mnid.size() > 1) {
+        int mn_add = LLONG_MAX;
+        for(int num : factors) {
+            if(a[idx] % num == 0)   continue;
+            mn_add = min(mn_add, num - a[idx] % num);
+        }
+        if(mn_add != LLONG_MAX)
+            ans = min(ans, mn_add * b[idx]);
         cout << ans << '\n';
         return;
     }
-
-    cout << "OK!\n";
-
-    int id = mnid[0];
-    for(int num : factors)
-        if(a[id] % num != 0)
-            ans = min(ans, b[id] * (num - a[id] % num));
+    int mn = LLONG_MAX, mn2 = LLONG_MAX, idx = -1;
+    for(int i = 0; i < n; i++) {
+        if(b[i] <= mn) {
+            mn2 = mn;
+            mn = b[i];
+            idx = i;
+        }
+        else if(b[i] > mn && b[i] <= mn2)   mn2 = b[i];
+        else    continue;
+    }
+    int ans = mn + mn2;
+    if(mn == mn2) {
+        for(int i = 0; i < n; i++) {
+            if(b[i] >= ans)  continue;
+            int v = a[i] + 1;
+            while(v > 1) {
+                int p = spf[v];
+                if(stamp[p] == cur_stamp) {
+                    ans = min(ans, b[i]);
+                    break;
+                }
+                while(v % p == 0)   v /= p;
+            }
+        }
+        cout << ans << '\n';
+        return;
+    }
+    int mn_add = LLONG_MAX;
+    for(int num : factors) {
+        if(a[idx] % num == 0)
+            continue;
+        mn_add = min(mn_add, num - a[idx] % num);
+    }
+    if(mn_add != LLONG_MAX)
+        ans = min(ans, mn_add * mn);
+    for(int i = 0; i < n; i++) {
+        if(i == idx || b[i] >= ans)  continue;
+        int v = a[i] + 1;
+        while(v > 1) {
+            int p = spf[v];
+            if(stamp[p] == cur_stamp) {
+                ans = min(ans, b[i]);
+                break;
+            }
+            while(v % p == 0)   v /= p;
+        }
+    }
     cout << ans << '\n';
+    return;
 }
 signed main() {
     ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-    euler_sieve(200001);
+    cin.tie(0);
+    euler_sieve(200005);
     cin >> t;
     while(t--)  solve();
     return 0;

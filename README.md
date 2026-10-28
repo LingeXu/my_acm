@@ -31,7 +31,7 @@
 | 胜意杯 | 5 题 | |
 | VP（CF 补题） | 8 场 | `VP/Div2/<round>/`，按题号字母平铺 |
 | 2026 ICPC Asia EC | 2 题 | `2026_ICPC_Asia_EC/` |
-| 模板库 | 67 个 | `templates/` |
+| 模板库 | 85 个 | `templates/` |
 
 > 统计口径：一个题目文件夹计 1 题，统计于 2026-09-10。
 
@@ -62,7 +62,7 @@ OI/
 ├── VP/                             # CF 补题：VP/Div2/<round>/，题号字母平铺
 ├── 胜意杯/
 ├── templates/                      # 模板库
-├── tools/                          # 工具脚本（cph 归档等）
+├── tools/                          # 工具脚本（cph 归档、templates.txt 重建、模板 PDF 生成）
 ├── prompts/                        # AI Agent 配置
 ├── .claude/                        # Claude Code 配置
 ├── STYLE.md                        # 个人码风文档（供 AI 对齐风格）
