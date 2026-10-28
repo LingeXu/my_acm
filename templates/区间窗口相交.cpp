@@ -1,4 +1,4 @@
-//求定长窗口 [x, x+m-1] 覆盖的点数; 区间按 l 排序且互不相交(则 r 也单调递增, 这是按 second 二分的前提)
+//区间窗口相交: 求定长窗口 [x, x+m-1] 覆盖的点数; 区间按 l 排序且互不相交(则 r 也单调递增, 这是按 second 二分的前提)
 //需预定义: vector<pair<int,int>> inf(n);  vector<int> pref(n + 1);
 //         pref[i + 1] = pref[i] + inf[i].second - inf[i].first + 1;
 //口诀: 左端找 r, 右端找 l, 中间全加两头修剪, 一个if管越界

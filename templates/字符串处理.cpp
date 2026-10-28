@@ -1,3 +1,5 @@
+//字符串处理: C++ string / stringstream 常用操作速查
+string s, t;
 s.substr(pos, len);             //不改变s, 返回截取的子串
 s.insert(pos, t);           
 s.erase(pos, len);              //改变s
@@ -31,7 +33,8 @@ while(pos < (int)s.size()) {
     pos = space + 1;
 }
 
-//字符操作             
+//字符操作
+char c;
 isdigit(c);   // 数字
 isalpha(c);   // 字母
 islower(c);   // 小写

@@ -1,3 +1,5 @@
+//扩展欧几里得: 求 gcd(a, b) 及一组 x, y 使 ax + by = gcd(a, b)
+//应用: 求逆元(不要求模为质数)、解线性丢番图方程; O(log max(a, b))
 int exgcd(int a, int b, int& x, int& y) {
     if(b == 0) {
         x = 1;

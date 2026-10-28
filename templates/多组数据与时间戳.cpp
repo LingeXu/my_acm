@@ -1,4 +1,4 @@
-//多组输入: 每组数据的重置技巧 (resize / assign / 时间戳)
+//多组数据与时间戳: 每组数据的重置技巧 (resize / assign / 时间戳)
 
 //vector 重置
 v.clear();                 //清空所有元素, 容量不变
@@ -18,6 +18,12 @@ void solve() {
         vis[x] = cur;      //打上本组标记
         //在此做该位置的初始化
     }
+}
+
+//时间戳惰性赋值: 等价于每组 memset(val, 0), 但只花实际用到位置的 O(1)
+if(vis[x] != cur) {
+    vis[x] = cur;
+    val[x] = 0;
 }
 
 //配套: 定长 vector 每组 resize 对齐即可, 不需 clear

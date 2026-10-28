@@ -1,3 +1,7 @@
+//kruskal: 最小生成树, O(m log m)
+//思想: 边按权升序, 不在同一连通块的边就选(并查集判环), 选满 n - 1 条即 MST
+//需预定义: struct edge { int u, v, w; };  vector<edge> graph;  int fa[N];
+//入口: kruskal();  返回 MST 总权值, -1 表示图不连通
 struct edge {
     int u, v, w;
 };

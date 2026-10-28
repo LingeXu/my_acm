@@ -1,3 +1,6 @@
+//bellmanford: 单源最短路(可负权边) + 判负环, O(nm)
+//需预定义: struct edge { int u, v, w; };  vector<edge> graph;  int dist[N];
+//入口: bellmanford(s);  判负环: 第 n 轮仍能松弛说明 s 可达的路径上存在负环
 struct edge {
     int u, v, w;
 };

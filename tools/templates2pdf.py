@@ -6,7 +6,7 @@
 依赖: xelatex / latexmk (TeX Live), pygments (pip install pygments)
 
 原理: 按各模板的标题注释行把 templates.txt 切成小节,
-按「章节 -> 小节」两级目录排版, minted 做 C++ 高亮。
+按「章节 -> 小节」两级目录排版, minted 做高亮(默认 cpp, 可用 LANG 指定)。
 修改模板后重新运行即可; 新增模板时在 SECTIONS 里按文件顺序补一行即可。
 """
 import os
@@ -21,14 +21,19 @@ OUT = os.path.join(ROOT, "templates", "templates.pdf")
 
 # (标题注释行前缀, 目录标题, 所属章节), 顺序需与 templates.txt 中的出现顺序一致
 SECTIONS = [
+    ("//快读快写",         "快读快写",             "基础技巧"),
+    ("//常用宏定义",       "常用宏定义缩写",       "基础技巧"),
+    ("//位运算",           "位运算与 builtin 函数", "基础技巧"),
+    ("//交互题裁判",       "交互题本地裁判",       "基础技巧"),
     ("//二分答案",         "二分答案",             "基础技巧"),
     ("//stl二分",          "STL 二分",             "基础技巧"),
     ("//步长二分",         "步长二分",             "基础技巧"),
     ("//双指针",           "双指针 / 尺取",        "基础技巧"),
-    ("//三分",             "三分搜索",             "基础技巧"),
+    ("//三分搜索",         "三分搜索",             "基础技巧"),
     ("//前缀和 + 哈希",    "前缀和 + 哈希",        "基础技巧"),
     ("//曼哈顿距离",       "曼哈顿与切比雪夫变换", "基础技巧"),
     ("//lambda自定义比较", "Lambda 自定义比较",    "基础技巧"),
+    ("//tuple",            "tuple 元组与 tie 解包", "基础技巧"),
     ("//区间窗口相交",     "区间窗口相交",         "基础技巧"),
     ("//多组数据与时间戳", "多组数据与时间戳",     "基础技巧"),
     ("//01背包",           "01 / 完全 / 多重背包", "动态规划"),
@@ -65,7 +70,7 @@ SECTIONS = [
     ("//树上最大独立集",   "树上最大独立集",       "动态规划"),
     ("//Tarjan",           "Tarjan（SCC / 割点 / 桥 / 2-SAT）", "图论"),
     ("//二分图",           "二分图与匈牙利",       "图论"),
-    ("//线段树",           "线段树（区间加 / 双 lazy / 二分）", "数据结构"),
+    ("//线段树:",          "线段树（区间加 / 双 lazy / 二分）", "数据结构"),
     ("//ST表",             "ST 表",                "数据结构"),
     ("//单调栈",           "单调栈",               "数据结构"),
     ("//单调队列",         "单调队列",             "数据结构"),
@@ -90,7 +95,32 @@ SECTIONS = [
     ("//Dinic",            "Dinic 最大流",         "网络流"),
     ("//最小费用最大流",   "费用流 MCMF",          "网络流"),
     ("//计算几何基础",     "计算几何基础",         "计算几何"),
+    ("//后缀数组",         "后缀数组 SA",          "字符串"),
+    ("//后缀自动机",       "后缀自动机 SAM",       "字符串"),
+    ("//回文自动机",       "回文自动机 PAM",       "字符串"),
+    ("//FHQ Treap",        "FHQ Treap 平衡树",     "数据结构"),
+    ("//二维树状数组",     "二维树状数组",         "数据结构"),
+    ("//李超线段树",       "李超线段树",           "数据结构"),
+    ("//线段树合并",       "线段树合并",           "数据结构"),
+    ("//CDQ分治",          "CDQ 分治",             "数据结构"),
+    ("//整体二分",         "整体二分",             "数据结构"),
+    ("//欧拉回路",         "欧拉回路 / 路径",      "图论"),
+    ("//严格次小生成树",   "严格次小生成树",       "图论"),
+    ("//虚树",             "虚树",                 "图论"),
+    ("//NTT",              "NTT 快速数论变换",     "数学"),
+    ("//Pollard-Rho",      "Pollard-Rho 质因数分解", "数学"),
+    ("//BSGS",             "BSGS 离散对数",        "数学"),
+    ("//高精度",           "高精度大整数",         "数学"),
+    ("#Linux环境速查",     "Linux 环境与命令",     "环境与调试"),
+    ("#手调技巧",          "手调技巧（命令篇）",   "环境与调试"),
+    ("//手调代码片段",     "手调技巧（代码篇）",   "环境与调试"),
 ]
+
+# 每节用哪种 Pygments lexer(默认 cpp); shell 速查用 bash 高亮才好看
+LANG = {
+    "#Linux环境速查": "bash",
+    "#手调技巧": "bash",
+}
 
 
 def parse_sections():
@@ -103,10 +133,10 @@ def parse_sections():
         pos.append(hits[0])
     assert pos == sorted(pos), "SECTIONS 顺序与 templates.txt 不一致, 请按文件顺序调整"
     result = []
-    for k, (_, title, cat) in enumerate(SECTIONS):
+    for k, (marker, title, cat) in enumerate(SECTIONS):
         start = pos[k]
         end = pos[k + 1] if k + 1 < len(pos) else len(lines)
-        result.append((title, cat, lines[start:end]))
+        result.append((marker, title, cat, lines[start:end]))
     return result
 
 
@@ -123,7 +153,7 @@ def build_tex(sections):
 \setCJKsansfont{STHeiti Medium}
 \setCJKmonofont{Songti SC}
 
-\setminted[cpp]{
+\setminted{
     fontsize=\footnotesize,
     breaklines=true,
     breakanywhere=true,
@@ -143,14 +173,14 @@ def build_tex(sections):
 \tableofcontents
 \newpage
 """)
-    cat_order = ["基础技巧", "动态规划", "图论", "数据结构", "字符串", "数学", "网络流", "计算几何"]
+    cat_order = ["基础技巧", "动态规划", "图论", "数据结构", "字符串", "数学", "网络流", "计算几何", "环境与调试"]
     for cat in cat_order:
         body.append(f"\\section{{{cat}}}\n")
-        for title, c, content in sections:
+        for marker, title, c, content in sections:
             if c != cat:
                 continue
             body.append(f"\\subsection{{{title}}}\n")
-            body.append(r"\begin{minted}{cpp}")
+            body.append(f"\\begin{{minted}}{{{LANG.get(marker, 'cpp')}}}")
             body.extend(content)
             body.append(r"\end{minted}")
             body.append("")
