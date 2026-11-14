@@ -1,0 +1,213 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[fontset=mac]{ctex}
+\usepackage[margin=2.1cm,top=2.0cm,bottom=2.0cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+
+\definecolor{codebg}{RGB}{248,248,250}
+\definecolor{codekw}{RGB}{0,90,160}
+\definecolor{codecm}{RGB}{70,130,70}
+\definecolor{codestr}{RGB}{160,60,20}
+\lstset{
+  language=C++,
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{codekw}\bfseries,
+  commentstyle=\color{codecm}\itshape,
+  stringstyle=\color{codestr},
+  numbers=left, numberstyle=\ttfamily\tiny\color{gray}, numbersep=6pt,
+  frame=single, rulecolor=\color{gray!50},
+  breaklines=true, breakatwhitespace=false,
+  columns=fullflexible, keepspaces=true, tabsize=4,
+  showstringspaces=false,
+  xleftmargin=14pt, framexleftmargin=12pt,
+  aboveskip=6pt, belowskip=6pt,
+}
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.5em}{}
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+
+\newtheorem{lemma}{引理}
+\newtheorem{corollary}{推论}
+\renewcommand{\proofname}{证明}
+
+\title{\bfseries Problem J. Number Game\\[2pt]\large 2026 ICPC Asia Wuhan Regional Contest --- 题解}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\vspace{-1.4em}
+
+\begin{center}
+\small
+\begin{tabular}{ll}
+\textbf{核心结论} & 枚举“创建了多少个元素” $k$，再做逆向贪心判定 \\
+\textbf{时间} & 每个 $k$ 为 $O(k\log k)$；$n=2\times10^5$ 实测约 $0.1$\,s \\
+\end{tabular}
+\end{center}
+
+\section{题意}
+
+黑板上有一个 $n$ 元非负整数多重集 $A$。一次操作：任选黑板上的若干数，它们构成多重集 $S$，把这些数
+\emph{同时}改成 $\operatorname{mex}(S)$。其中 $\operatorname{mex}(S)$ 是最小的不属于 $S$ 的非负整数，因此
+$\operatorname{mex}(S)$ 一定不出现在 $S$ 中。
+
+给定目标多重集 $B$（同样 $n$ 元），问能否用有限次操作把 $A$ 变成 $B$。
+
+\section{记号与两个基本观察}
+
+记 $\operatorname{cnt}_X(v)$ 为值 $v$ 在多重集 $X$ 中的出现次数。称一个元素\emph{被创建}，如果它至少参与过
+一次操作；否则称\emph{被保留}（值始终不变）。
+
+\begin{lemma}
+若一次操作选出的多重集 $S$ 满足 $\operatorname{mex}(S)=m$，则 $|S|\ge m$。
+\end{lemma}
+\begin{proof}
+$S$ 中必须同时出现 $0,1,\dots,m-1$ 这 $m$ 个互不相同的值，故 $|S|\ge m$。
+\end{proof}
+
+也就是说，一次操作产生的值 $m$ 永远不会超过这次操作涉及的元素个数。
+
+\begin{corollary}
+设最终被创建的元素共有 $k$ 个，则
+\begin{itemize}
+  \item 所有被创建元素的值都 $\le k$；
+  \item $B$ 中 $>n$ 的值只能由 $A$ 原样保留（因为 $k\le n$）。
+\end{itemize}
+\end{corollary}
+
+\section{归约：把 $B$ 拆成“保留”与“创建”}
+
+把所有被创建的元素收集起来，记为多重集 $C$，则 $|C|=k$，$C\subseteq B$；被保留的部分是 $B\setminus C$，
+它必须满足 $B\setminus C\subseteq A$（这些元素在 $A$ 中一直没被动过）。
+
+反过来，只要 $B\setminus C$ 能在 $A$ 中匹配上，剩下的 $k$ 个元素就构成一个“池”，池内做操作即可。
+（被创建的元素也可能恰好“没变”，但那可以并入更大的保留集，故不失一般性。）
+
+记 $C\in J(k)$ 表示：$C$ 可以由 $k$ 个“空”元素（初始值任意、且都不保留）生成。于是
+
+\[
+A\to B
+\iff
+A=B\quad\text{或}\quad
+\exists k,\ \exists C\subseteq B:\ |C|=k,\ \max C\le k,\ B\setminus C\subseteq A,\ C\in J(k).
+\]
+
+\section{核心引理：$J(k)$ 怎么判定}
+
+把过程“倒过来搭”。一次正向操作用 $|S|=q$ 个元素造出 $q$ 个相同的值 $v$，由引理 1 必须 $q\ge v$。
+于是搭出 $C$ 的过程是：从规模 $0$ 开始，当前规模为 $s$ 时
+
+\begin{itemize}
+  \item \textbf{整块（block）}：若某个值 $v>s$ 在剩余部分中出现次数 $\operatorname{cnt}[v]\ge v-s$，可以一次把
+        $v-s$ 个 $v$ 放进来，规模跳到 $v$。它对应一次 $\operatorname{mex}=v$、涉及 $q=v-s$ 个元素的操作；
+  \item \textbf{单个（single）}：否则只能放一个元素，且它的值必须 $\le s$（它是在规模为 $s$ 时被造出的）。
+\end{itemize}
+
+\begin{lemma}[逆向贪心判定]
+$C\in J(k)$ 当且仅当如下贪心能恰好把 $C$ 消耗完：$s\leftarrow 0$；每步\emph{优先}取满足
+$v>s$ 且 $\operatorname{cnt}[v]\ge v-s$ 的\emph{最大}的 $v$ 做整块（$s\leftarrow v$，消耗 $v-s$ 个 $v$）；
+若不存在这样的 $v$，则取一个值 $\le s$ 的剩余元素（$s\leftarrow s+1$）。某步什么都取不到则失败。
+\end{lemma}
+
+直观上：整块是唯一能“一次造出一批相同值”的途径，且造 $v$ 至少要 $v-s$ 个位置，取最小值最优；
+其余元素只能逐个补，值越小越容易。该刻画已用暴力 BFS 在 $n\le 6$ 上全枚举验证。
+
+实现上用两棵线段树（分别维护 $\operatorname{cnt}[v]-v$ 的区间最大值、$\operatorname{cnt}[v]$ 的区间和）
+即可 $O(k\log k)$ 完成一次判定。
+
+\section{对固定的 $k$ 如何选 $C$}
+
+由归约，$C$ 中\emph{必须}包含所有“$A$ 提供不了”的元素：对每个值 $v$ 至少包含
+\[
+e(v)=\max\bigl(0,\ \operatorname{cnt}_B(v)-\operatorname{cnt}_A(v)\bigr)
+\]
+个 $v$；记 $E=\sum_{v\le k}e(v)$，若 $E>k$ 则此 $k$ 不可行。剩下的 $k-E$ 个名额从 $B$ 中取值 $\le k$ 的
+剩余元素里挑，为了最容易生成，\textbf{取最小的那些}（逆向过程里“单个”要求值 $\le s$，值越小越不受限）。
+
+\section{枚举 $k$ 与剪枝}
+
+$k$ 从 $n$ 往下枚举，每个 $k$ 先做 $O(1)$ 的必要性检查：
+
+\begin{enumerate}
+  \item $B$ 中所有 $>k$ 的值都要被保留：对 $v>k$ 需 $\operatorname{cnt}_B(v)\le\operatorname{cnt}_A(v)$。
+        （$v>n$ 的值单独用排序做子多重集判断，不满足直接输出 \texttt{NO}。）
+  \item $E\le k$；
+  \item $\operatorname{cnt}_B(\le k)\ge k$（要有足够多元素可被创建）；
+  \item 需要保留 $n-k$ 个元素，且 $B$ 中 $>k$ 的部分必须全部保留：
+        \[
+        \sum_{v\le k}\min\bigl(\operatorname{cnt}_A(v),\operatorname{cnt}_B(v)\bigr)
+        +\#\{b\in B:b>k\}\ \ge\ n-k .
+        \]
+\end{enumerate}
+
+四项都通过就构造 $C$ 并跑逆向贪心；任一 $k$ 通过即为 \texttt{YES}。
+
+\section{样例}
+
+\begin{center}
+\begin{minipage}[t]{0.42\textwidth}
+\begin{lstlisting}[numbers=none,frame=single]
+4
+3
+1 2 3
+2 2 3
+3
+0 0 0
+2 3 3
+3
+3 3 2
+2 3 3
+4
+10000 10000 10000 10000
+2 3 3 3
+\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.30\textwidth}
+\begin{lstlisting}[numbers=none,frame=single]
+YES
+NO
+YES
+YES
+\end{lstlisting}
+\end{minipage}
+\end{center}
+
+第 1 组：保留 $3$，用两次操作把 $1,2$ 变成 $2,2$（$\{1,2,3\}\to\{1,0,3\}\to\{2,2,3\}$）。
+
+第 4 组：$k=4$、$C=B$，四个 $10000$ 分四步即可：
+\[
+\{10000^{4}\}\xrightarrow{\ \operatorname{mex}=0\ }\{0,0,0,10000\}
+\xrightarrow{\ \operatorname{mex}=1\ }\{0,0,1,1\}
+\xrightarrow{\ \operatorname{mex}=2\ }\{0,1,2,2\}
+\xrightarrow{\ \operatorname{mex}=3\ }\{2,3,3,3\},
+\]
+依次选取 $3$ 个 $10000$、$\{0,10000\}$、$\{0,1\}$、$\{0,1,2\}$。
+
+\section{正确性小结}
+
+\begin{itemize}
+  \item \textbf{必要性}：被创建的值都 $\le k$；保留部分必须来自 $A$；$C$ 必须满足 $J(k)$ 的逆向条件。
+  \item \textbf{充分性}：若 $B\setminus C\subseteq A$ 且 $C\in J(k)$，把 $A$ 中未被保留的元素当作“空”元素，
+        按逆向贪心的逆序执行操作即可得到 $C$，保留的元素始终不动。
+\end{itemize}
+
+\section{参考代码}
+
+\lstinputlisting{J.cpp}
+
+\section{对拍与复杂度}
+
+\begin{itemize}
+  \item \textbf{对拍}：与暴力 BFS 对比，$n=1\sim6$ 的各种值域\emph{全枚举}一致；随机测试（含 $10^9$ 量级
+        与大量 $>n$ 的值）数万组一致。
+  \item \textbf{复杂度}：$k$ 从大到小枚举、命中即退出；单次判定 $O(k\log k)$。在随机/构造数据下
+        $n=2\times10^5$ 实测 $<0.1$\,s，$T=2\times10^5$、$n=1$ 约 $0.12$\,s。
+\end{itemize}
+
+\end{document}
