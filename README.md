@@ -1,6 +1,6 @@
 # 刷题记录
 
-这里记录着我的OI/ACM成长历程。
+这里记录着我的ACM成长历程。
 
 ---
 
@@ -9,8 +9,8 @@
 主要用来：
 
 1. **存档** — 防止本地代码丢失
-2. **复盘** — 偶尔回来看看自己写了些什么, 为日后水帖做准备
-3. **记录** — 随缘更新，看到长时间荒废请踢我。
+2. **复盘** — 便于赛后复盘补题
+3. **记录** — 随缘更新，长时间荒废请踢
 
 ---
 
@@ -123,27 +123,10 @@ my_acm/
 
 ---
 
-## AI Agent 使用
-
-本仓库配套 Trae IDE 智能体，用于辅助代码审查与风格管理：
-
-| Agent | 配置文件 | 用途 |
-|-------|----------|------|
-| `oi-code-reviewer` | `prompts/AGENT_OI_CODE_REVIEWER.md` | 审查代码、调试 WA/TLE/MLE/RE、讲解思路 |
-| `style-writer` | `prompts/AGENT_STYLE_WRITER.md` | 分析代码生成/更新 `STYLE.md` |
-
-### 日常使用
-
-1. **调试bug**：打开 `.cpp` 文件，@oi-code-reviewer 请求审查
-2. **更新码风**：@style-writer，指令 `分析 my_acm/ 文件夹生成 STYLE.md`
-3. **风格对齐**：审查前将 `STYLE.md` 贴入对话，让 Agent 按你的习惯诊断
-
----
-
 ## 关于
 
 - 语言标准：C++17
-- 每周一次 commit+push 存档（由 Claude Code 自动完成）
+- 每周一次 commit+push 存档（由 Claude Code 完成）
 
 ---
 
