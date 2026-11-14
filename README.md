@@ -45,7 +45,7 @@
 | 内容 | 已收录 | 备注 |
 |:---|:---:|:---|
 | VP（虚拟参赛） | 46 场 / 182 份代码 | `vp/{ABC,Div2,Div3}/<场次>/` |
-| rt（同结构归档） | 14 场 / 69 份代码 | `rt/{ABC,Div2,Div3}/<场次>/` |
+| rt（正式 rating 场次） | 14 场 / 69 份代码 | `rt/{ABC,Div2,Div3}/<场次>/` |
 | 模板库 | 92 个 | `templates/`，`.cpp` / `.sh` |
 
 > 统计口径：比赛按题目文件夹计 1 题，`vp/`、`rt/` 按代码文件计；统计于 2026-11-14。
@@ -80,7 +80,7 @@ my_acm/
 │   ├── 2026_胜意杯/
 │   └── 2026_集训队_MM.DD/          # 集训队个人赛（08.21 / 09.01 / 09.03 / 09.05 / 09.27 / 10.06）
 ├── vp/                             # 虚拟参赛：vp/{ABC,Div2,Div3}/<场次>/，题号平铺
-├── rt/                             # 与 vp/ 同结构的另一组比赛归档
+├── rt/                             # 正式 rating 场次：rt/{ABC,Div2,Div3}/<场次>/，题号平铺
 ├── templates/                      # 模板库（92 个 .cpp/.sh；templates.txt、templates.pdf 为生成物）
 ├── tools/                          # 工具脚本（cph 归档、templates.txt 重建、模板 PDF 生成）
 ├── prompts/                        # AI Agent 配置
@@ -95,7 +95,7 @@ my_acm/
 
 - 平台文件夹：平台英文小写（`luogu`、`codeforces`、`nowcoder`）
 - 比赛文件夹：`年份_比赛名`，年份前置、下划线分隔、名称尽量短（`2026_ICPC_EC1`、`2026_CCPC_热身赛1`、`2026_集训队_08.21`）
-- 套题归档：`vp|rt/{ABC,Div2,Div3}/<场次>/`，题目不再分层、直接平铺（`vp/Div2/1002/2059A.cpp`；AtCoder 用题名 `vp/ABC/473/Change_Schools.cpp`）
+- 套题归档：`vp|rt/{ABC,Div2,Div3}/<场次>/`（`vp` 虚拟参赛、`rt` 正式 rating 场次），题目不再分层、直接平铺（`vp/Div2/1002/2059A.cpp`；AtCoder 用题名 `vp/ABC/473/Change_Schools.cpp`）
 - 题目文件夹：平台题号（`P1000`、`1742C`、`T767313`）
 - 代码文件：
   - `{题号}.cpp` — 第一版（方法隐含）
