@@ -40,7 +40,7 @@
 ## 仓库结构
 
 ```
-OI/
+my_acm/
 ├── luogu/                          # 洛谷
 │   └── P1001/                      # 每题一个文件夹（题号为目录名）
 │       ├── P1001.cpp               # 第一版
@@ -118,7 +118,7 @@ OI/
 ### 日常使用
 
 1. **调试bug**：打开 `.cpp` 文件，@oi-code-reviewer 请求审查
-2. **更新码风**：@style-writer，指令 `分析 OI/ 文件夹生成 STYLE.md`
+2. **更新码风**：@style-writer，指令 `分析 my_acm/ 文件夹生成 STYLE.md`
 3. **风格对齐**：审查前将 `STYLE.md` 贴入对话，让 Agent 按你的习惯诊断
 
 ---
